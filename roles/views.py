@@ -1,6 +1,7 @@
 import random
 
 from django.shortcuts import render
+from django.http import JsonResponse
 
 from roles.models import Homonym, AgentNoun
 
@@ -17,20 +18,25 @@ levels = [
 
 
 def home(request):
-    level = random.choice(levels)
+    level = request.GET.get('level', random.choice(levels))
 
-    agent_noun = AgentNoun.objects.raw('''
+    agent_noun = request.GET.get('agent_noun', AgentNoun.objects.raw('''
         select * from {0} limit 1
         offset floor(random() * (select count(*) from {0}))
-    '''.format(AgentNoun._meta.db_table))[0]
+    '''.format(AgentNoun._meta.db_table))[0].word)
 
-    homonym = Homonym.objects.raw('''
+    homonym = request.GET.get('noun', Homonym.objects.raw('''
         select * from {0} limit 1
         offset floor(random() * (select count(*) from {0}))
-    '''.format(Homonym._meta.db_table))[0]
+    '''.format(Homonym._meta.db_table))[0].word)
 
-    return render(request, 'home.html', context={
+    context = {
         'level': level,
-        'agent_noun': agent_noun.word,
-        'noun': homonym.word
-    })
+        'agent_noun': agent_noun,
+        'noun': homonym
+    }
+
+    if request.is_ajax():
+        return JsonResponse(context)
+
+    return render(request, 'home.html', context=context)

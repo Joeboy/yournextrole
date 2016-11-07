@@ -34,7 +34,12 @@
     padding: .4em .8em .4em .8em;
     border-radius: .5em;
     border: 4px solid #448;
+}
+
+#yournextrole p a {
     color: #fff;
+    text-decoration: none;
+    text-transform: capitalize;
 }
 
 #container {
@@ -48,15 +53,43 @@
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+$(document).ready(function() {
+    $('#yournextrole a').click(function() {
+        data = {
+            level: $('#level').text(),
+            noun: $('#noun').text(),
+            agent_noun: $('#agent_noun').text()
+        }
+        delete data[this.id];
+        $.ajax({
+            url:'./',
+            data: data
+        }).done(function(data) {
+            console.log(data);
+            $('#level').text(data.level);
+            $('#noun').text(data.noun);
+            $('#agent_noun').text(data.agent_noun);
+        });
+        return false;
+    });
+});
+    </script>
   </head>
   <body>
   <div id="container">
   <h2>Your Next Role</h2>
   <p>We have assessed your career potential and determined that your next role should be:</p>
   <div id="yournextrole">
-    <p>{{ level|title }} {{ noun|title }} {{ agent_noun|title }}</p>
+    <p><a id="level" href="/?noun={{ noun|urlencode }}&amp;agent_noun={{ agent_noun|urlencode }}">{{ level }}</a>
+       <a id="noun"  href="/?level={{ level|urlencode }}&amp;agent_noun={{ agent_noun|urlencode }}">{{ noun }}</a>
+       <a id="agent_noun"  href="/?level={{ level|urlencode }}&amp;noun={{ noun|urlencode }}">{{ agent_noun }}</a></p>
   </div>
   <p>We wish you luck in your new position.</p>
+
+  <p><a href="./">Click here</a> for a second opinion, or click the words if you don't like any of them.</p>
+
+  <p id="about">Code for this website is available <a href="https://github.com/Joeboy/yournextrole">here</a>.</p>
 
   </div>
 
