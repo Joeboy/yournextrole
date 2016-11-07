@@ -29,7 +29,6 @@ def home(request):
         offset floor(random() * (select count(*) from {0}))
     '''.format(Homonym._meta.db_table))[0]
 
-
     return render(request, 'home.html', context={
         'level': level,
         'agent_noun': agent_noun.word,
